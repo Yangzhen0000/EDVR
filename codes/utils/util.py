@@ -133,6 +133,8 @@ def tensor2img(tensor, out_type=np.uint8, min_max=(0, 1)):
     if out_type == np.uint8:
         img_np = (img_np * 255.0).round()
         # Important. Unlike matlab, numpy.unit8() WILL NOT round by default.
+    elif out_type == np.uint16:
+        img_np = (img_np * 65535.0).round()
     return img_np.astype(out_type)
 
 
@@ -230,7 +232,7 @@ def calculate_psnr(img1, img2):
     mse = np.mean((img1 - img2)**2)
     if mse == 0:
         return float('inf')
-    return 20 * math.log10(255.0 / math.sqrt(mse))
+    return 20 * math.log10(65535.0 / math.sqrt(mse))
 
 
 def ssim(img1, img2):

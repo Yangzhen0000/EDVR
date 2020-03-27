@@ -66,13 +66,14 @@ def _read_img_lmdb(env, key, size):
     size: (C, H, W) tuple"""
     with env.begin(write=False) as txn:
         buf = txn.get(key.encode('ascii'))
-    img_flat = np.frombuffer(buf, dtype=np.uint8)
+    # img_flat = np.frombuffer(buf, dtype=np.uint8)
+    img_flat = np.frombuffer(buf, dtype=np.uint16)
     C, H, W = size
     img = img_flat.reshape(H, W, C)
     return img
 
 
-def read_img(env, path, size=None, scale=255., zoomout=False):
+def read_img(env, path, size=None, scale=65535., zoomout=False):
     """read image by cv2 or from lmdb
     return: Numpy float32, HWC, BGR, [0,1]"""
     if env is None:  # img

@@ -229,8 +229,10 @@ def main():
                             model.feed_data(val_data)
                             model.test()
                             visuals = model.get_current_visuals()
-                            rlt_img = util.tensor2img(visuals['rlt'])  # uint8
-                            gt_img = util.tensor2img(visuals['GT'])  # uint8
+                            # rlt_img = util.tensor2img(visuals['rlt'])  # uint8
+                            # gt_img = util.tensor2img(visuals['GT'])  # uint8
+                            rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)
+                            gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)
                             # calculate PSNR
                             psnr_rlt[folder][idx_d] = util.calculate_psnr(rlt_img, gt_img)
 
@@ -272,8 +274,8 @@ def main():
                             model.feed_data(val_data)
                             model.test()
                             visuals = model.get_current_visuals()
-                            rlt_img = util.tensor2img(visuals['rlt'])  # uint8
-                            gt_img = util.tensor2img(visuals['GT'])  # uint8
+                            rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)  # uint16
+                            gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)  # uint16
 
                             # calculate PSNR
                             psnr = util.calculate_psnr(rlt_img, gt_img)

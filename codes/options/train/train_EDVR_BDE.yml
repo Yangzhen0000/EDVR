@@ -2,9 +2,10 @@
 name: 002_EDVR_lr4e-4_600k_SDR4k_LrCAR4S_fixTSA50k_new
 use_tb_logger: true
 model: video_base  # video restoration model
-#### distortion: sr
+distortion: bde
 #### scale: 4
-gpu_ids: [0,1]
+# gpu_ids: [0,1]
+gpu_ids: [0]
 
 #### datasets
 datasets:
@@ -21,7 +22,7 @@ datasets:
     N_frames: 5
     use_shuffle: true
     n_workers: 3  # per GPU
-    batch_size: 32
+    batch_size: 1  # original setting 32
     GT_size: 256
     LQ_size: 256
     use_flip: true
@@ -30,8 +31,8 @@ datasets:
   val:
     name: SDR4k
     mode: video_test
-    dataroot_GT: ../datasets/SDR4k/SDR_10bit/val  # ?
-    dataroot_LQ: ../datasets/SDR4k/SDR_4bit/val  # ?
+    dataroot_GT: ../datasets/SDR4k/val/10bit
+    dataroot_LQ: ../datasets/SDR4k/val/4bit
     cache_data: True
     N_frames: 5
     padding: new_info
@@ -45,7 +46,7 @@ network_G:
   front_RBs: 5
   back_RBs: 10
   predeblur: false
-  HR_in: false
+  HR_in: True  # restore in low resolution space
   w_TSA: true
 
 #### path

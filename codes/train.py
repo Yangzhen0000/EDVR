@@ -217,6 +217,9 @@ def main():
                             pbar = util.ProgressBar(len(val_set))
                         for idx in range(rank, len(val_set), world_size):
                             val_data = val_set[idx]
+
+                            tb_logger.add_images('val/input', val_data['LQs'][2].unsqueeze_(0), current_step)
+                            
                             val_data['LQs'].unsqueeze_(0)
                             val_data['GT'].unsqueeze_(0)
                             folder = val_data['folder']
@@ -231,6 +234,10 @@ def main():
                             visuals = model.get_current_visuals()
                             # rlt_img = util.tensor2img(visuals['rlt'])  # uint8
                             # gt_img = util.tensor2img(visuals['GT'])  # uint8
+
+                            tb_logger.add_images('val/output', visuals['rlt'], current_step)
+                            tb_logger.add_images('val/gt', visuals['GT'], current_step)
+
                             rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)
                             gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)
                             # calculate PSNR
@@ -265,9 +272,11 @@ def main():
                         psnr_rlt_avg = {}
                         psnr_total_avg = 0.
                         for val_data in val_loader:
+                            print("val_data", val_data)
                             folder = val_data['folder'][0]
-                            idx_d = val_data['idx'].item()
+                            # idx_d = val_data['idx'].item()
                             # border = val_data['border'].item()
+                            idx_d, max_idx = val_data['idx'][0].split('/')
                             if psnr_rlt.get(folder, None) is None:
                                 psnr_rlt[folder] = []
 
@@ -276,6 +285,9 @@ def main():
                             visuals = model.get_current_visuals()
                             rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)  # uint16
                             gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)  # uint16
+
+                            # cv2.imwrite("", rlt_img)
+                            # cv2.imwrite("", gt_img)
 
                             # calculate PSNR
                             psnr = util.calculate_psnr(rlt_img, gt_img)

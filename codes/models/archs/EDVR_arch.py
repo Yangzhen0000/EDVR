@@ -262,11 +262,13 @@ class EDVR(nn.Module):
                 H, W = H // 4, W // 4
         else:
             if self.HR_in:
+                x = x.contiguous()
                 L1_fea = self.lrelu(self.conv_first_1(x.view(-1, C, H, W)))
                 L1_fea = self.lrelu(self.conv_first_2(L1_fea))
                 L1_fea = self.lrelu(self.conv_first_3(L1_fea))
                 H, W = H // 4, W // 4
             else:
+                x = x.contiguous()
                 L1_fea = self.lrelu(self.conv_first(x.view(-1, C, H, W)))
         L1_fea = self.feature_extraction(L1_fea)
         # L2

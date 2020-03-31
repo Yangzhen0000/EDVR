@@ -10,6 +10,7 @@ class VideoTestDataset(data.Dataset):
     Vid4
     REDS4
     Vimeo90K-Test
+    SDR4k
 
     no need to prepare LMDB files
     """
@@ -26,7 +27,7 @@ class VideoTestDataset(data.Dataset):
             raise ValueError('No need to use LMDB during validation/test.')
         #### Generate data info and cache data
         self.imgs_LQ, self.imgs_GT = {}, {}
-        if opt['name'].lower() in ['vid4', 'reds4']:
+        if opt['name'].lower() in ['vid4', 'reds4', 'sdr4k']:
             subfolders_LQ = util.glob_file_list(self.LQ_root)
             subfolders_GT = util.glob_file_list(self.GT_root)
             for subfolder_LQ, subfolder_GT in zip(subfolders_LQ, subfolders_GT):
@@ -48,8 +49,12 @@ class VideoTestDataset(data.Dataset):
                 self.data_info['border'].extend(border_l)
 
                 if self.cache_data:
-                    self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ)
-                    self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT)
+                    if opt['name'].lower() == 'sdr4k':
+                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=65535.)
+                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=65535.)
+                    else:
+                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=255.)
+                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=255.)
         elif opt['name'].lower() in ['vimeo90k-test']:
             pass  # TODO
         else:

@@ -116,7 +116,7 @@ class SDR4kDataset(data.Dataset):
 
         #### determine the neighbor frames
         interval = random.choice(self.interval_list)
-        if self.opt['border_mode']:
+        if self.opt['border_mode']:  # false
             direction = 1  # 1: forward; 0: backward
             N_frames = self.opt['N_frames']
             if self.random_reverse and random.random() < 0.5:
@@ -132,20 +132,18 @@ class SDR4kDataset(data.Dataset):
             else:
                 neighbor_list = list(
                     range(center_frame_idx, center_frame_idx - interval * N_frames, -interval))
-            # name_b = '{:08d}'.format(neighbor_list[0])
             name_b = '{:03d}'.format(neighbor_list[0])
         else:
-            # ensure not exceeding the borders
+            # ensure not exceeding the borders, range (1, 100)
             while (center_frame_idx + self.half_N_frames * interval >
-                   99) or (center_frame_idx - self.half_N_frames * interval < 0):
-                center_frame_idx = random.randint(0, 99)
+                   100) or (center_frame_idx - self.half_N_frames * interval < 1):
+                center_frame_idx = random.randint(1, 100)
             # get the neighbor list
             neighbor_list = list(
                 range(center_frame_idx - self.half_N_frames * interval,
                       center_frame_idx + self.half_N_frames * interval + 1, interval))
             if self.random_reverse and random.random() < 0.5:
                 neighbor_list.reverse()
-            # name_b = '{:08d}'.format(neighbor_list[self.half_N_frames])
             name_b = '{:03d}'.format(neighbor_list[self.half_N_frames])
         assert len(
             neighbor_list) == self.opt['N_frames'], 'Wrong length of neighbor list: {}'.format(
@@ -157,7 +155,6 @@ class SDR4kDataset(data.Dataset):
             # img_GT = img_GT.astype(np.float32) / 255.
             img_GT = img_GT.astype(np.float32) / 65535.
         elif self.data_type == 'lmdb':
-            # img_GT = util.read_img(self.GT_env, key, (3, 720, 1280))
             img_GT = util.read_img(self.GT_env, key, (3, 2160, 3840), scale=65535.)
         else:
             img_GT = util.read_img(None, osp.join(self.GT_root, name_a, name_b + '.png'), scale=65535.)
@@ -166,8 +163,8 @@ class SDR4kDataset(data.Dataset):
         # LQ_size_tuple = (3, 180, 320) if self.LR_input else (3, 720, 1280)
         LQ_size_tuple = (3, 2160, 3840)
         img_LQ_l = []
+        # print("neighbor_list:", neighbor_list)
         for v in neighbor_list:
-            # img_LQ_path = osp.join(self.LQ_root, name_a, '{:08d}.png'.format(v))
             img_LQ_path = osp.join(self.LQ_root, name_a, '{:03d}.png'.format(v))
             if self.data_type == 'mc':
                 if self.LR_input:
@@ -178,7 +175,8 @@ class SDR4kDataset(data.Dataset):
                 # img_LQ = img_LQ.astype(np.float32) / 255.
                 img_LQ = img_LQ.astype(np.float32) / 65535.
             elif self.data_type == 'lmdb':
-                img_LQ = util.read_img(self.LQ_env, '{}_{:08d}'.format(name_a, v), LQ_size_tuple, scale=65535.)
+                # print('{}_{:03d}'.format(name_a, v))
+                img_LQ = util.read_img(self.LQ_env, '{}_{:03d}'.format(name_a, v), LQ_size_tuple, scale=65535.)
             else:
                 img_LQ = util.read_img(None, img_LQ_path, scale=65535.)
             img_LQ_l.append(img_LQ)

@@ -16,7 +16,7 @@ import utils.util as util  # noqa: E402
 
 def main():
     dataset = 'SDR4k'  # vimeo90K | REDS | general (e.g., DIV2K, 291) | DIV2K_demo |test
-    mode = '10bit'  # used for vimeo90k and REDS datasets
+    mode = '4bit'  # used for vimeo90k and REDS datasets
     # vimeo90k: GT | LR | flow
     # REDS: train_sharp, train_sharp_bicubic, train_blur_bicubic, train_blur, train_blur_comp
     #       train_sharp_flowx4
@@ -422,14 +422,14 @@ def SDR4k(mode):
     if mode == "10bit":
         # img_folder = "..\\..\\datasets\\SDR_10bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_10bit.lmdb"  # for windows
-        img_folder = "../../datasets/SDR_10bit"  # for linux
-        lmdb_save_path = "../../datasets/SDR_10bit.lmdb"  # for linux
+        img_folder = "../../datasets/SDR4k/SDR_10bit"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/SDR_10bit.lmdb"  # for linux
         H_dst, W_dst = 2160, 3840
     elif mode == "4bit":
         # img_folder = "..\\..\\datasets\\SDR_4bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_4bit.lmdb"
-        img_folder = "../../datasets/SDR_4bit"  # for linux
-        lmdb_save_path = "../../datasets/SDR_4bit.lmdb"  # for linux
+        img_folder = "../../datasets/SDR4k/SDR_4bit"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/SDR_4bit.lmdb"  # for linux
         H_dst, W_dst = 2160, 3840
     n_thread = 40
     ########################################################

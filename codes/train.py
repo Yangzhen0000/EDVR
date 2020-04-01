@@ -154,8 +154,17 @@ def main():
             model.update_learning_rate(current_step, warmup_iter=opt['train']['warmup_iter'])
 
             #### training
-            model.feed_data(train_data)
-            model.optimize_parameters(current_step)
+            model.feed_data(train_data)  # put LQs and GT to device
+            model.optimize_parameters(current_step)  # forward, loss, backward, update
+
+            #### visualization
+            # if opt['use_tb_logger'] and current_step == 1:
+            #     print("Visualizing...")
+            #     visuals = model.get_current_visuals()
+
+            #     tb_logger.add_images('train/LQs', visuals['LQ'], current_step)
+            #     tb_logger.add_image('train/GT', visuals['GT'], current_step)
+            #     tb_logger.add_image('train/res', visuals['rlt'], current_step)
 
             #### log
             if current_step % opt['logger']['print_freq'] == 0:
@@ -189,8 +198,8 @@ def main():
                         model.test()
 
                         visuals = model.get_current_visuals()
-                        sr_img = util.tensor2img(visuals['rlt'])  # uint8
-                        gt_img = util.tensor2img(visuals['GT'])  # uint8
+                        sr_img = util.tensor2img(visuals['rlt'])  # default out_type: uint16
+                        gt_img = util.tensor2img(visuals['GT'])  # default out_type: uint16
 
                         # Save SR images for reference
                         save_img_path = os.path.join(img_dir,
@@ -217,9 +226,6 @@ def main():
                             pbar = util.ProgressBar(len(val_set))
                         for idx in range(rank, len(val_set), world_size):
                             val_data = val_set[idx]
-
-                            tb_logger.add_images('val/input', val_data['LQs'][2].unsqueeze_(0), current_step)
-                            
                             val_data['LQs'].unsqueeze_(0)
                             val_data['GT'].unsqueeze_(0)
                             folder = val_data['folder']
@@ -232,14 +238,17 @@ def main():
                             model.feed_data(val_data)
                             model.test()
                             visuals = model.get_current_visuals()
-                            # rlt_img = util.tensor2img(visuals['rlt'])  # uint8
-                            # gt_img = util.tensor2img(visuals['GT'])  # uint8
 
-                            tb_logger.add_images('val/output', visuals['rlt'], current_step)
-                            tb_logger.add_images('val/gt', visuals['GT'], current_step)
+                            #### visualization
+                            if opt['use_tb_logger'] and idx == 50:
+                                print("Visualizing...")
 
-                            rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)
-                            gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)
+                                tb_logger.add_images('validation/LQs', visuals['LQ'], current_step)
+                                tb_logger.add_image('validation/GT', visuals['GT'], current_step)
+                                tb_logger.add_image('validation/res', visuals['rlt'], current_step)
+
+                            rlt_img = util.tensor2img(visuals['rlt']) # default out_type: uint16
+                            gt_img = util.tensor2img(visuals['GT']) # default out_type: uint16
                             # calculate PSNR
                             psnr_rlt[folder][idx_d] = util.calculate_psnr(rlt_img, gt_img)
 
@@ -283,8 +292,8 @@ def main():
                             model.feed_data(val_data)
                             model.test()
                             visuals = model.get_current_visuals()
-                            rlt_img = util.tensor2img(visuals['rlt'], out_type=np.uint16)  # uint16
-                            gt_img = util.tensor2img(visuals['GT'], out_type=np.uint16)  # uint16
+                            rlt_img = util.tensor2img(visuals['rlt'])  # default out_type: uint16
+                            gt_img = util.tensor2img(visuals['GT'])  # default out_type: uint16
 
                             # cv2.imwrite("", rlt_img)
                             # cv2.imwrite("", gt_img)

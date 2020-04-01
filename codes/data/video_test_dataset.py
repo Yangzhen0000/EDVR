@@ -50,11 +50,11 @@ class VideoTestDataset(data.Dataset):
 
                 if self.cache_data:
                     if opt['name'].lower() == 'sdr4k':
-                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=65535.)
-                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=65535.)
+                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=65535., zoomout=(1280, 720))  # avoid too large input
+                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=65535., zoomout=(1280, 720))  # avoid too large input
                     else:
-                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=255.)
-                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=255.)
+                        self.imgs_LQ[subfolder_name] = util.read_img_seq(img_paths_LQ, scale=255., zoomout=(1280, 720))
+                        self.imgs_GT[subfolder_name] = util.read_img_seq(img_paths_GT, scale=255., zoomout=(1280, 720))
         elif opt['name'].lower() in ['vimeo90k-test']:
             pass  # TODO
         else:

@@ -43,7 +43,7 @@ class SDR4kDataset(data.Dataset):
         self.data_type = self.opt['data_type']
         self.LR_input = False if opt['GT_size'] == opt['LQ_size'] else True  # low resolution inputs
         #### directly load image keys
-        if self.data_type == 'lmdb':
+        if self.data_type == 'lmdb':  # directory ends with lmdb or not
             self.paths_GT, _ = util.get_image_paths(self.data_type, opt['dataroot_GT'])
             logger.info('Using lmdb meta info for cache keys.')
         elif opt['cache_keys']:

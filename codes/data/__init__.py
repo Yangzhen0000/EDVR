@@ -37,7 +37,7 @@ def create_dataset(dataset_opt):
         from data.REDS_dataset import REDSDataset as D
     elif mode == 'Vimeo90K':
         from data.Vimeo90K_dataset import Vimeo90KDataset as D
-    elif mode == 'video_test':
+    elif mode == 'video_test':  # for validation
         from data.video_test_dataset import VideoTestDataset as D
     elif mode == 'SDR4k':
         from data.SDR4k_dataset import SDR4kDataset as D

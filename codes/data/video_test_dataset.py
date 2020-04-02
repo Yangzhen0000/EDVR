@@ -59,7 +59,7 @@ class VideoTestDataset(data.Dataset):
             pass  # TODO
         else:
             raise ValueError(
-                'Not support video test dataset. Support Vid4, REDS4 and Vimeo90k-Test.')
+                'Not support video test dataset. Support Vid4, REDS4, Vimeo90k-Test and SDR4k.')
 
     def __getitem__(self, index):
         # path_LQ = self.data_info['path_LQ'][index]

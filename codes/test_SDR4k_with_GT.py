@@ -102,8 +102,8 @@ def main():
             util.mkdirs(save_subfolder)
 
         #### read LBD and GT images
-        #### resize to avoid cuda out of memory, 2160x3840->1080x1920
-        imgs_LBD = data_util.read_img_seq(subfolder, scale=65535., zoomout=True)
+        #### resize to avoid cuda out of memory, 2160x3840->720x1280
+        imgs_LBD = data_util.read_img_seq(subfolder, scale=65535., zoomout=(1280, 720))
         img_GT_l = []
         for img_GT_path in sorted(glob.glob(osp.join(subfolder_GT, '*'))):
             img_GT_l.append(data_util.read_img(None, img_GT_path, scale=65535., zoomout=True))

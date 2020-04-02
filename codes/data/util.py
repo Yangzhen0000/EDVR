@@ -75,7 +75,7 @@ def _read_img_lmdb(env, key, size):
     return img
 
 
-def read_img(env, path, size=None, scale=65535., zoomout=False):
+def read_img(env, path, size=None, scale=65535., zoomout=None):
     """read image by cv2 or from lmdb
     return: Numpy float32, HWC, BGR, [0,1]"""
     if env is None:  # img
@@ -83,7 +83,7 @@ def read_img(env, path, size=None, scale=65535., zoomout=False):
     else:
         img = _read_img_lmdb(env, path, size)
     if zoomout:
-        img = cv2.resize(img, (1280, 720))
+        img = cv2.resize(img, zoomout)
     img = img.astype(np.float32) / scale
     if img.ndim == 2:
         img = np.expand_dims(img, axis=2)
@@ -93,7 +93,7 @@ def read_img(env, path, size=None, scale=65535., zoomout=False):
     return img
 
 
-def read_img_seq(path, scale=255., zoomout=False):
+def read_img_seq(path, scale=255., zoomout=None):
     """Read a sequence of images from a given folder path
     Args:
         path (list/str): list of image paths/image folder path

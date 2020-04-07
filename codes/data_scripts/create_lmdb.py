@@ -418,18 +418,18 @@ def SDR4k(mode):
     #### configurations
     read_all_imgs = False  # whether real all images to memory with multiprocessing
     # Set False for use limited memory
-    BATCH = 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
+    BATCH = 1000 # 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
     if mode == "10bit":
         # img_folder = "..\\..\\datasets\\SDR_10bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_10bit.lmdb"  # for windows
-        img_folder = "../../datasets/SDR4k/SDR_10bit"  # for linux
-        lmdb_save_path = "../../datasets/SDR4k/SDR_10bit.lmdb"  # for linux
+        img_folder = "../../datasets/SDR4k/train/SDR_10BIT"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/train/SDR_10BIT.lmdb"  # for linux
         H_dst, W_dst = 2160, 3840
     elif mode == "4bit":
         # img_folder = "..\\..\\datasets\\SDR_4bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_4bit.lmdb"
-        img_folder = "../../datasets/SDR4k/SDR_4bit"  # for linux
-        lmdb_save_path = "../../datasets/SDR4k/SDR_4bit.lmdb"  # for linux
+        img_folder = "../../datasets/SDR4k/train/SDR_4BIT"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/train/SDR_4BIT.lmdb"  # for linux
         H_dst, W_dst = 2160, 3840
     n_thread = 40
     ########################################################

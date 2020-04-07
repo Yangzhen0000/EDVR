@@ -13,4 +13,4 @@
 # 2 GPUs
 # python -m torch.distributed.launch --nproc_per_node=2 --master_port=4321 train.py -opt options/train/train_EDVR_BDE.yml --launcher pytorch
 # 1 GPU
-CUDA_VISIBLE_DEVICES=0 python -m torch.distributed.launch train.py -opt options/train/train_EDVR_BDE.yml --launcher pytorch
+CUDA_VISIBLE_DEVICES=0 python train.py -opt options/train/train_EDVR_BDE.yml

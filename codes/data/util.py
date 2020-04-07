@@ -169,12 +169,12 @@ def index_generation(crt_i, max_n, N, padding='reflection'):
 
 def quantization(high_bitdepth=16, low_bitdepth=4):
     # parent directory of all GT video clips
-    gt_data_dir = "C:\\Users\\61636\\Desktop\\EDVR\\codes\\data\\SDR_10bit"
+    gt_data_dir = "/home/medialab/workspace/hdd/zhen/EDVR/datasets/SDR4k/val/SDR_10BIT"
     gt_video_list = glob.glob(os.path.join(gt_data_dir, "????????"))
     #print(gt_video_list)
 
     parent_dir = os.path.dirname(gt_data_dir)
-    zp_data_dir = os.path.join(parent_dir, "SDR_4bit")
+    zp_data_dir = os.path.join(parent_dir, "SDR_4BIT")
     if not os.path.exists(zp_data_dir):
         os.mkdir(zp_data_dir)
 
@@ -183,14 +183,17 @@ def quantization(high_bitdepth=16, low_bitdepth=4):
         zp_filepath = os.path.join(zp_data_dir, filename)
         if not os.path.exists(zp_filepath):
             os.mkdir(zp_filepath)
-        gt_imglist = glob.glob(os.path.join(video_path, "*.png"))
-        for gt_img in gt_imglist:
-            #print(gt_img)
-            imgpath, imgname = os.path.split(gt_img)
-            image = cv2.imread(gt_img, 3)
-            image = image // np.power(2, high_bitdepth-low_bitdepth) * np.power(2, high_bitdepth-low_bitdepth)
-            cv2.imwrite(os.path.join(zp_filepath, imgname), image)
-        print("Finish quantizing video clip%s" % filename)
+            gt_imglist = glob.glob(os.path.join(video_path, "*.png"))
+            print("Start quantizing video clip %s" % filename)
+            for gt_img in gt_imglist:
+                #print(gt_img)
+                imgpath, imgname = os.path.split(gt_img)
+                image = cv2.imread(gt_img, 3)
+                image = image // np.power(2, high_bitdepth-low_bitdepth) * np.power(2, high_bitdepth-low_bitdepth)
+                cv2.imwrite(os.path.join(zp_filepath, imgname), image)
+            print("Finish quantizing video clip %s" % filename)
+        else:
+            pass
 
 
 def augment(img_list, hflip=True, rot=True):

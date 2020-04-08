@@ -56,6 +56,19 @@ def get_image_paths(data_type, dataroot):
     return paths, sizes
 
 
+def get_video_paths(dataroot):
+    "get video path list"
+    videos = []
+    if dataroot is not None:
+        assert os.path.isdir(dataroot), '{:s} is not a valid directory'.format(dataroot)
+        for dirname in sorted(os.listdir(dataroot)):
+            video_path = os.path.join(dataroot, dirname)
+            if os.path.isdir(video_path):
+                videos.append(video_path)
+    sizes = len(videos)
+    return videos, sizes
+
+
 def glob_file_list(root):
     return sorted(glob.glob(os.path.join(root, '*')))
 

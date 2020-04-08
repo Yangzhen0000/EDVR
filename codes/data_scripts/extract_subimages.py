@@ -111,8 +111,8 @@ def extract_single(opt):
         os.makedirs(save_folder)
         # print('mkdir [{:s}] ...'.format(save_folder))
     else:
-        print('Folder [{:s}] already exists. Exit...'.format(save_folder))
-        sys.exit(1)
+        print('Folder [{:s}] already exists. Continue...'.format(save_folder))
+        # sys.exit(1)
     
     # img_list = data_util._get_paths_from_images(input_folder)
     video_list, _ = data_util.get_video_paths(input_folder)
@@ -131,12 +131,30 @@ def extract_single(opt):
     step = opt['step']
     thres_sz = opt['thres_sz']
     for video_path in video_list:
+        pbar.update()
         video_name = osp.basename(video_path)
+        save_video_folder = osp.join(opt['save_folder'], video_name)
+        if not osp.exists(save_video_folder):
+            os.makedirs(save_video_folder)
+            # print('mkdir [{:s}] ...'.format(save_folder))
+        else:
+            print('Folder [{:s}] already exists. Continue...'.format(save_video_folder))
+            continue
+
+        print('Processing video {:s}...'.format(video_name))
         left, right, bottom, top = rm_border(osp.join(video_path, "001.png"))  # cut for all images in one video
         
-        img_list = osp.join(video_path, os.listdir(video_path))
-        for img_path in sorted(img_list):
-            img_name = osp.basename(img_path)
+        for img_name in sorted(os.listdir((video_path))):
+            save_folder = osp.join(save_video_folder, osp.splitext(img_name)[0])
+            # print("save_folder", save_folder)
+            if not osp.exists(save_folder):
+                os.makedirs(save_folder)
+                # print('mkdir [{:s}] ...'.format(save_folder))
+            else:
+                print('Folder [{:s}] already exists. Continue...'.format(save_folder))
+                continue
+            print('Processing frame {:s} ...'.format(img_name))
+            img_path = osp.join(video_path, img_name)
             img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
             img = img[left:right, bottom:top, :]
 
@@ -156,14 +174,6 @@ def extract_single(opt):
                 w_space = np.append(w_space, w - crop_sz)
 
             index = 0
-            save_folder = osp.join(opt['save_folder'], video_name, osp.splitext(img_name)[0])
-            # print("save_folder", save_folder)
-            if not osp.exists(save_folder):
-                os.makedirs(save_folder)
-                # print('mkdir [{:s}] ...'.format(save_folder))
-            else:
-                print('Folder [{:s}] already exists. Exit...'.format(save_folder))
-                sys.exit(1)
             for x in h_space:
                 for y in w_space:
                     index += 1
@@ -177,8 +187,6 @@ def extract_single(opt):
                         osp.join(save_folder, 'p{:03d}.png'.format(index)), crop_img,
                         [cv2.IMWRITE_PNG_COMPRESSION, opt['compression_level']])
                     # print('Write patch {:s}'.format(osp.join(save_folder, 'p{:03d}.png'.format(index))))
-            print('Processing {:s} ...'.format(img_name))
-        pbar.update(1)
 
 
 def worker(path, opt):
@@ -211,8 +219,8 @@ def worker(path, opt):
         os.makedirs(save_folder)
         print('mkdir [{:s}] ...'.format(folder))
     else:
-        print('Folder [{:s}] already exists. Exit...'.format(save_folder))
-        sys.exit(1)
+        print('Folder [{:s}] already exists. Continue...'.format(save_folder))
+        # sys.exit(1)
     for x in h_space:
         for y in w_space:
             index += 1

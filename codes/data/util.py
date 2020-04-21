@@ -6,6 +6,9 @@ import numpy as np
 import glob
 import torch
 import cv2
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.util import ProgressBar
 
 ####################
 # Files & IO
@@ -97,6 +100,9 @@ def read_img(env, path, size=None, scale=65535., zoomout=None):
         img = _read_img_lmdb(env, path, size)
     if zoomout:
         img = cv2.resize(img, zoomout)
+    while img is None:
+        print("Error occured in reading {}, try again...".format(path))
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
     img = img.astype(np.float32) / scale
     if img.ndim == 2:
         img = np.expand_dims(img, axis=2)
@@ -118,7 +124,12 @@ def read_img_seq(path, scale=255., zoomout=None):
         img_path_l = path
     else:
         img_path_l = sorted(glob.glob(os.path.join(path, '*')))
+
     img_l = [read_img(None, v, scale=scale, zoomout=zoomout) for v in img_path_l]
+    # img_l = []
+    # for v in img_path_l:
+    #     print("img_path:", v)
+    #     img_l.append(read_img(None, v, scale=scale, zoomout=zoomout))
     # stack to Torch tensor
     imgs = np.stack(img_l, axis=0)
     imgs = imgs[:, :, :, [2, 1, 0]]
@@ -182,31 +193,31 @@ def index_generation(crt_i, max_n, N, padding='reflection'):
 
 def quantization(high_bitdepth=16, low_bitdepth=4):
     # parent directory of all GT video clips
-    gt_data_dir = "/home/medialab/workspace/hdd/zhen/EDVR/datasets/SDR4k/val/SDR_10BIT"
-    gt_video_list = glob.glob(os.path.join(gt_data_dir, "????????"))
+    gt_data_dir = "/home/medialab/workspace/hdd/zhen/EDVR/datasets/SDR4k/train/SDR_10BIT_patch"
+    gt_video_list = glob.glob(os.path.join(gt_data_dir, "*"))
+    pbar = ProgressBar(len(gt_video_list))
     #print(gt_video_list)
 
+
     parent_dir = os.path.dirname(gt_data_dir)
-    zp_data_dir = os.path.join(parent_dir, "SDR_4BIT")
+    zp_data_dir = os.path.join(parent_dir, "SDR_4BIT_patch")
     if not os.path.exists(zp_data_dir):
         os.mkdir(zp_data_dir)
 
     for video_path in gt_video_list:
+        pbar.update()
         filepath, filename = os.path.split(video_path)
         zp_filepath = os.path.join(zp_data_dir, filename)
         if not os.path.exists(zp_filepath):
             os.mkdir(zp_filepath)
             gt_imglist = glob.glob(os.path.join(video_path, "*.png"))
-            print("Start quantizing video clip %s" % filename)
+            print("Start quantizing video clip %s ..." % filename)
             for gt_img in gt_imglist:
                 #print(gt_img)
                 imgpath, imgname = os.path.split(gt_img)
                 image = cv2.imread(gt_img, 3)
                 image = image // np.power(2, high_bitdepth-low_bitdepth) * np.power(2, high_bitdepth-low_bitdepth)
                 cv2.imwrite(os.path.join(zp_filepath, imgname), image)
-            print("Finish quantizing video clip %s" % filename)
-        else:
-            pass
 
 
 def augment(img_list, hflip=True, rot=True):

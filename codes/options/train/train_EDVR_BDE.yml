@@ -1,5 +1,5 @@
 #### general settings
-name: 002_EDVR_lr4e-4_600k_SDR4k_LrCAR4S_fixTSA50k_new
+name: 002_EDVR_lr4e-4_600k_SDR4k
 use_tb_logger: true
 model: video_base  # video restoration model
 distortion: bde
@@ -15,8 +15,8 @@ datasets:
     interval_list: [1]  # ?
     random_reverse: false
     border_mode: false
-    dataroot_GT: ../datasets/SDR4k/train/SDR_10BIT.lmdb
-    dataroot_LQ: ../datasets/SDR4k/train/SDR_4BIT.lmdb
+    dataroot_GT: ../datasets/SDR4k/train/SDR_10BIT_patch
+    dataroot_LQ: ../datasets/SDR4k/train/SDR_4BIT_patch
     cache_keys: ~
 
     N_frames: 5
@@ -43,8 +43,8 @@ network_G:
   nf: 64
   nframes: 5
   groups: 8
-  front_RBs: 5
-  back_RBs: 10
+  front_RBs: 10  # 5 
+  back_RBs: 20  # 10
   predeblur: false
   HR_in: True  # restore in low resolution space
   w_TSA: true
@@ -53,7 +53,7 @@ network_G:
 path:
   pretrain_model_G: ~  # ../experiments/pretrained_models/EDVR_REDS_SR_M.pth
   strict_load: false
-  resume_state: ~
+  resume_state: ~  # ../experiments/001_EDVR_lr4e-4_600k_SDR4k/training_state/385000.state
 
 #### training settings: learning rate scheme, loss
 train:

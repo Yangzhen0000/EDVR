@@ -418,19 +418,21 @@ def SDR4k(mode):
     #### configurations
     read_all_imgs = False  # whether real all images to memory with multiprocessing
     # Set False for use limited memory
-    BATCH = 1000 # 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
+    BATCH = 5000 # 5000  # After BATCH images, lmdb commits, if read_all_imgs = False
     if mode == "10bit":
         # img_folder = "..\\..\\datasets\\SDR_10bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_10bit.lmdb"  # for windows
-        img_folder = "../../datasets/SDR4k/train/SDR_10BIT"  # for linux
-        lmdb_save_path = "../../datasets/SDR4k/train/SDR_10BIT.lmdb"  # for linux
-        H_dst, W_dst = 2160, 3840
+        img_folder = "../../datasets/SDR4k/train/SDR_10BIT_patch"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/train/SDR_10BIT_patch.lmdb"  # for linux
+        # H_dst, W_dst = 2160, 3840
+        H_dst, W_dst = 480, 480
     elif mode == "4bit":
         # img_folder = "..\\..\\datasets\\SDR_4bit"  # for windows
         # lmdb_save_path = "..\\..\\datasets\\SDR_4bit.lmdb"
-        img_folder = "../../datasets/SDR4k/train/SDR_4BIT"  # for linux
-        lmdb_save_path = "../../datasets/SDR4k/train/SDR_4BIT.lmdb"  # for linux
-        H_dst, W_dst = 2160, 3840
+        img_folder = "../../datasets/SDR4k/train/SDR_4BIT_patch"  # for linux
+        lmdb_save_path = "../../datasets/SDR4k/train/SDR_4BIT_patch.lmdb"  # for linux
+        # H_dst, W_dst = 2160, 3840
+        H_dst, W_dst = 480, 480
     n_thread = 40
     ########################################################
     if not lmdb_save_path.endswith('.lmdb'):
@@ -449,6 +451,7 @@ def SDR4k(mode):
         folder = split_rlt[-2]
         img_name = split_rlt[-1].split('.png')[0]
         keys.append(folder + '_' + img_name)
+        # keys: 00000000_000_000
 
     if read_all_imgs:
         #### read all images to memory (multiprocessing)
@@ -479,6 +482,7 @@ def SDR4k(mode):
     print("Start writing...")
     pbar = util.ProgressBar(len(all_img_list))
     txn = env.begin(write=True)
+    rm_list = []
     for idx, (path, key) in enumerate(zip(all_img_list, keys)):
         pbar.update('Write {}'.format(key))
         key_byte = key.encode('ascii')
@@ -486,8 +490,13 @@ def SDR4k(mode):
         H, W, C = data.shape
         assert H == H_dst and W == W_dst and C == 3, 'different shape.'
         txn.put(key_byte, data)
+        # delete the image
+        rm_list.append(path)
         if not read_all_imgs and idx % BATCH == 0:
             txn.commit()
+            for img in rm_list:
+                print('os.system('rm {}')'.format(img))
+            rm_list = []
             txn = env.begin(write=True)
     txn.commit()
     env.close()

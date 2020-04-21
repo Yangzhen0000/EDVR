@@ -240,12 +240,12 @@ def main():
                             visuals = model.get_current_visuals()
 
                             #### visualization
-                            if opt['use_tb_logger'] and idx == 50:
-                                print("Visualizing...")
+                            # if opt['use_tb_logger'] and idx == 50:
+                            #     print("Visualizing...")
 
-                                tb_logger.add_images('validation/LQs', visuals['LQ'], current_step)
-                                tb_logger.add_image('validation/GT', visuals['GT'], current_step)
-                                tb_logger.add_image('validation/res', visuals['rlt'], current_step)
+                            #     tb_logger.add_images('validation/LQs', visuals['LQ'], current_step)
+                            #     tb_logger.add_image('validation/GT', visuals['GT'], current_step)
+                            #     tb_logger.add_image('validation/res', visuals['rlt'], current_step)
 
                             rlt_img = util.tensor2img(visuals['rlt']) # default out_type: uint16
                             gt_img = util.tensor2img(visuals['GT']) # default out_type: uint16
@@ -281,7 +281,7 @@ def main():
                         psnr_rlt_avg = {}
                         psnr_total_avg = 0.
                         for val_data in val_loader:
-                            print("val_data", val_data)
+                            # print("val_data", val_data)
                             folder = val_data['folder'][0]
                             # idx_d = val_data['idx'].item()
                             # border = val_data['border'].item()
@@ -292,6 +292,15 @@ def main():
                             model.feed_data(val_data)
                             model.test()
                             visuals = model.get_current_visuals()
+
+                            #### visualization
+                            if opt['use_tb_logger'] and int(idx_d) == 50:
+                                print("Visualizing...")
+
+                                tb_logger.add_images('validation/LQs', visuals['LQ'], current_step)
+                                tb_logger.add_image('validation/GT', visuals['GT'], current_step)
+                                tb_logger.add_image('validation/res', visuals['rlt'], current_step)
+
                             rlt_img = util.tensor2img(visuals['rlt'])  # default out_type: uint16
                             gt_img = util.tensor2img(visuals['GT'])  # default out_type: uint16
 

@@ -49,14 +49,16 @@ class SDR4kDataset(data.Dataset):
         elif opt['cache_keys']:
             logger.info('Using cache keys: {}'.format(opt['cache_keys']))
             self.paths_GT = pickle.load(open(opt['cache_keys'], 'rb'))['keys']
+        elif self.data_type == 'img':
+            self.paths_GT, _ = util.get_image_paths(self.data_type, opt['dataroot_GT'])
         else:
             raise ValueError(
                 'Need to create cache keys (meta_info.pkl) by running [create_lmdb.py]')
-
+        # print(len(self.paths_GT))
         # remove the SDR4k for testing
-        self.paths_GT = [
-            v for v in self.paths_GT if v.split('_')[0] not in ['', '', '', '']
-        ]
+        # self.paths_GT = [
+        #     v for v in self.paths_GT if v.split('_')[0] not in ['', '', '', '']
+        # ]
         assert self.paths_GT, 'Error: GT path is empty.'
 
         if self.data_type == 'lmdb':
@@ -111,7 +113,13 @@ class SDR4kDataset(data.Dataset):
         scale = self.opt['scale']
         GT_size = self.opt['GT_size']
         key = self.paths_GT[index]
-        name_a, name_b = key.split('_')
+        # ../../datasets/SDR4k/train/SDR_10BIT_patch/00000000_p000/000.png
+        # name_a: video name, '00000000_000'
+        # name_b: frame name, '000', without extension 'png'
+        # name_a, name_b = key.split('_')
+        name_a = osp.dirname(key).split('/')[-1]
+        name_b = osp.splitext(osp.basename(key))[0]
+
         center_frame_idx = int(name_b)
 
         #### determine the neighbor frames
@@ -161,7 +169,8 @@ class SDR4kDataset(data.Dataset):
 
         #### get LQ images
         # LQ_size_tuple = (3, 180, 320) if self.LR_input else (3, 720, 1280)
-        LQ_size_tuple = (3, 2160, 3840)
+        # LQ_size_tuple = (3, 2160, 3840)
+        LQ_size_tuple = (3, 480, 480)
         img_LQ_l = []
         # print("neighbor_list:", neighbor_list)
         for v in neighbor_list:
